@@ -11,7 +11,7 @@ def load_image(path, scale = None):
     return obj
 
 # добавление всей основной графики в код
-garry = load_image("harry.png")
+harry = load_image("harry.png")
 background = load_image("backgrounds/level.jpg")
 start_menu =load_image("backgrounds/start.png")
 end_menu = load_image("backgrounds/end.png", (1200, 600))
@@ -29,17 +29,17 @@ for i in range(12):
 
 # загрузка всех видов врагов
 dementor = load_image("enemys/dementor.png")
-pojirateli = load_image("enemys/death_eaters.png")
-sova = []
+death_eater = load_image("enemys/death_eaters.png")
+owls = []
 clans = []
-piu = []
+attacks = []
 
 for filename in ["enemys/owl0.png", "enemys/owl1.png", "enemys/owl2.png"]:
-    sova.append(load_image(filename))
+    owls.append(load_image(filename))
 
 for filename in ["enemys/ravenclaw.png", "enemys/hufflepuff.png", "enemys/slytherin.png"]:
     clans.append(load_image(filename))
 
 # загрузка анимации попадания
 for filename in ["attack/attack0.png", "attack/attack1.png", "attack/attack2.png", "attack/attack3.png", "attack/attack4.png"]:
-    piu.append(load_image(filename))
+    attacks.append(load_image(filename))
