@@ -1,9 +1,10 @@
 import pygame
+from all_graphics import explosion_anim 
 
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self, image, center):
+    def __init__(self, center):
         pygame.sprite.Sprite.__init__(self)
-        self.image = image
+        self.image = explosion_anim[0]
         self.rect = self.image.get_rect()
         self.rect.center = center
         self.frame = 0
@@ -15,10 +16,10 @@ class Explosion(pygame.sprite.Sprite):
         if now - self.last_update > self.frame_rate:
             self.last_update = now
             self.frame += 1
-            if self.frame == len(self.image):
+            if self.frame == len(explosion_anim):
                 self.kill()
             else:
                 center = self.rect.center
-                self.image = self.image[self.frame]
+                self.image = explosion_anim[self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.center = center

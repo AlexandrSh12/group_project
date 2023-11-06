@@ -1,7 +1,7 @@
 import pygame
 import random
 from all_graphics import attacks
-from main import WIDTH
+from vars import WIDTH
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):

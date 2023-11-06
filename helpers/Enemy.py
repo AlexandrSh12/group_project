@@ -1,7 +1,7 @@
 import pygame
 import random
 
-from main import WIDTH
+from vars import WIDTH
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, images, speedXRandomScope, speedYRandomScope = None):
@@ -23,7 +23,7 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rect.x -= self.speedx
 
-        if self.speedy:
+        if hasattr(self, 'speedy'):
             self.rect.y += self.speedy
 
         if self.rect.right < 0:
@@ -31,5 +31,5 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.x = random.randrange(WIDTH, WIDTH + 100)
             self.speedx = random.randrange(self.__speedXRandomScope[0], self.__speedXRandomScope[1])
 
-            if self.__speedYRandomScope != None:
+            if self.__speedYRandomScope != None and hasattr(self, 'speedy'):
                 self.speedy = random.randrange(self.__speedYRandomScope[0], self.__speedYRandomScope[1])

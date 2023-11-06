@@ -1,7 +1,7 @@
 
 import pygame
 from all_graphics import harry
-from main import WIDTH, HEIGHT
+from vars import WIDTH, HEIGHT
 
 
 class Player(pygame.sprite.Sprite):

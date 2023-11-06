@@ -6,7 +6,7 @@ DIR_PATH = Path.cwd()
 def load_image(path, scale = None):
     obj = pygame.image.load(Path(DIR_PATH, "resources", "graphics", path))
     if scale != None:
-        pygame.transform.scale(obj, scale)
+        obj = pygame.transform.scale(obj, scale)
 
     return obj
 

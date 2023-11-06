@@ -8,6 +8,7 @@ pygame.mixer.init()
 def load_sound(filename, volume):
     obj = pygame.mixer.Sound(Path(dir_path, "resources", "sound", filename))
     obj.set_volume(volume)
+    return obj
 
 click = load_sound("click.wav", 0.09)
 shoot_sound = load_sound("shoot.wav", 0.5)
