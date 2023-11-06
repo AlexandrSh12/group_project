@@ -1,11 +1,12 @@
 import pygame
 from pathlib import Path
-from all_graphics import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater
+from all_graphics import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater, again_btn, quit_btn
 from all_sound import hit_sound, hit_enemy_sound, click, victory_sound, end_menu_sound, shoot_sound, main_theme
 from helpers.Explosion import Explosion
 from helpers.Enemy import Enemy
 from helpers.Player import Player
 from helpers.Bullet import Bullet
+from helpers.Button import Button
 from vars import WIDTH, HEIGHT, FPS
 
 DIR_PATH = Path.cwd()
@@ -19,6 +20,7 @@ pygame.display.set_caption("Гарри Поттер")
 clock = pygame.time.Clock()
 game_over = True
 running = True
+waiting = False
 all_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 player = Player()
@@ -83,7 +85,20 @@ def show_go_screen():
                 # pygame.mixer.music.play(loops=-1)
                 # pygame.mixer.music.set_volume(0.2)
 
+def startGameAgain():
+    global waiting
+    global running
+    global game_over
+    running = True
+    game_over = True
+    waiting = False
+
+def quitGame():
+    waiting = False
+    pygame.quit()
+
 def show_out_screen():
+    global waiting
     draw_text(screen, str(score), 60, WIDTH / 1.4, HEIGHT / 1.75)
     pygame.mixer.music.stop() # остановка всего звука
     hit_sound.stop()
@@ -97,15 +112,28 @@ def show_out_screen():
         screen.blit(end_menu, end_menu.get_rect()) # если гарри умер, то вывод проигрышного экрана
         end_menu_sound.play()
 
+    group = pygame.sprite.Group()
+    again_btn_obj = Button(again_btn, again_btn.get_rect(center=(WIDTH / 3 - 50, HEIGHT / 1.35)), startGameAgain)
+    quit_btn_obj = Button(quit_btn, quit_btn.get_rect(center=(WIDTH / 1.5 + 50, HEIGHT / 1.35)), quitGame)
+    group.add(again_btn_obj, quit_btn_obj)
+    
     pygame.display.flip()
     waiting = True
     while waiting:
         clock.tick(FPS)
-        for event in pygame.event.get():
+        event_list = pygame.event.get()
+        for event in event_list:
+            
             if event.type == pygame.QUIT: # выход из игры
-                pygame.quit()
+                quitGame()
+
+        group.update(event_list)
+        group.draw(screen)
+        pygame.display.flip()
 
 def handle_harry_collision_with_enemy(enemy, damage):
+    global running
+    global game_over
     hits = pygame.sprite.spritecollide(player, enemy, True)
     for hit in hits:
         player.hp -= damage
@@ -131,9 +159,10 @@ def handle_attacks_collision_with_enemy(enemys, score_number, create_enemy_func)
 for i in range(6):
     new_enemy()
 
+show_go_screen()
 while running:
     if game_over:
-        show_go_screen()
+        
         game_over = False
         all_sprites = pygame.sprite.Group()
         bullets = pygame.sprite.Group()
