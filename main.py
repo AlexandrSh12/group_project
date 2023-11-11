@@ -7,7 +7,8 @@ from helpers.Enemy import Enemy
 from helpers.Player import Player
 from helpers.Bullet import Bullet
 from helpers.Button import Button
-from vars import WIDTH, HEIGHT, FPS
+from helpers.DataBase import DataBase
+from vars import WIDTH, HEIGHT, FPS, MAX_SCORE
 
 DIR_PATH = Path.cwd()
 
@@ -31,6 +32,7 @@ death = pygame.sprite.Group()
 dem = pygame.sprite.Group()
 sov = pygame.sprite.Group()
 cl = pygame.sprite.Group()
+data_base = DataBase()
 score = 0
 
 def create_dementor():
@@ -70,6 +72,7 @@ def draw_text(surf, text, size, x, y):
 # функция вывода стартового меню
 def show_go_screen():
     screen.blit(start_menu, start_menu.get_rect()) # загрузка картинки
+    draw_text(screen, f'Лучший счёт: {data_base.getMaxScore()}', 35, 250, HEIGHT / 1.5)
     pygame.display.flip()
     waiting = True
     # pygame.mixer.music.play(loops=-1)
@@ -87,25 +90,28 @@ def show_go_screen():
 
 def startGameAgain():
     global waiting
-    global running
+    global runningw
     global game_over
     running = True
     game_over = True
     waiting = False
 
 def quitGame():
+    global waiting
     waiting = False
     pygame.quit()
 
 def show_out_screen():
+    global score
     global waiting
-    draw_text(screen, str(score), 60, WIDTH / 1.4, HEIGHT / 1.75)
+    global data_base
+    data_base.updateMaxScore(score)
     pygame.mixer.music.stop() # остановка всего звука
     hit_sound.stop()
     hit_enemy_sound.stop()
     shoot_sound.stop()
     
-    if score >= 1000: # если набрано необходимое количество очков, вывод победного экрана
+    if score >= MAX_SCORE: # если набрано необходимое количество очков, вывод победного экрана
         screen.blit(victory, victory.get_rect()) #
         victory_sound.play() # проигрыш звука победы
     else:
@@ -129,21 +135,16 @@ def show_out_screen():
 
         group.update(event_list)
         group.draw(screen)
+        draw_text(screen, str(score), 60, WIDTH / 1.45, HEIGHT / 2.3)
         pygame.display.flip()
 
 def handle_harry_collision_with_enemy(enemy, damage):
-    global running
-    global game_over
     hits = pygame.sprite.spritecollide(player, enemy, True)
     for hit in hits:
         player.hp -= damage
         hit_sound.play()
         expl = Explosion(hit.rect.center)
         all_sprites.add(expl)
-        if player.hp <= 0:
-            running = False
-            game_over = True
-            show_out_screen()
 
 def handle_attacks_collision_with_enemy(enemys, score_number, create_enemy_func):
     global score
@@ -152,7 +153,6 @@ def handle_attacks_collision_with_enemy(enemys, score_number, create_enemy_func)
         hit_enemy_sound.play()
         expl = Explosion(hit.rect.center)
         all_sprites.add(expl)
-        print(score)
         score += score_number
         create_enemy_func()
 
@@ -162,7 +162,6 @@ for i in range(6):
 show_go_screen()
 while running:
     if game_over:
-        
         game_over = False
         all_sprites = pygame.sprite.Group()
         bullets = pygame.sprite.Group()
@@ -207,11 +206,11 @@ while running:
     handle_attacks_collision_with_enemy(sov, 20, create_owl)
     handle_attacks_collision_with_enemy(death, 30, create_death_eater)
 
-    if score >= 1000:
+    if score >= MAX_SCORE:
         show_out_screen()
-        victory_sound.play()
-        running = False
-        game_over = True
+    
+    if player.hp <= 0:
+        show_out_screen()
 
     # Рендеринг
     screen.blit(background, background.get_rect())
@@ -221,9 +220,11 @@ while running:
     all_sprites.draw(screen)
     draw_text(screen, str(score), 48, WIDTH - 550, 27)
     draw_text(screen, str(player.hp), 48, WIDTH - 80, 27)
-    draw_text(screen, "ЦЕЛЬ:1000", 48, 180, HEIGHT - 75)
+    draw_text(screen, f'ЦЕЛЬ:{MAX_SCORE}', 48, 180, HEIGHT - 75)
 
     # После отрисовки всего, обновляем экран
     pygame.display.flip()
 
 pygame.quit()
+waiting = False
+running = False

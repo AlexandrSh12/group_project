@@ -14,4 +14,4 @@ class Button(pygame.sprite.Sprite):
                 if self.rect.collidepoint(event.pos):
                     self.__callback()
             if self.rect.collidepoint(pygame.mouse.get_pos()):
-                print("MOUSE HOVER")
+                pass
