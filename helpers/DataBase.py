@@ -4,6 +4,7 @@ from pathlib import Path
 
 class DataBase():
     def __init__(self):
+        print(tempfile.gettempdir())
         self.__connection = sqlite3.connect(str(Path(tempfile.gettempdir(), "HarryPotter.db")))
         self.__cursor = self.__connection.cursor()
 

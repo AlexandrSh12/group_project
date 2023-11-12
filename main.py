@@ -1,18 +1,17 @@
 import pygame
 from pathlib import Path
 from all_graphics import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater, again_btn, quit_btn
-from all_sound import hit_sound, hit_enemy_sound, click, victory_sound, end_menu_sound, shoot_sound, main_theme
+from all_sound import hit_sound, hit_enemy_sound, click, victory_sound, end_menu_sound, shoot_sound
 from helpers.Explosion import Explosion
 from helpers.Enemy import Enemy
 from helpers.Player import Player
 from helpers.Bullet import Bullet
 from helpers.Button import Button
 from helpers.DataBase import DataBase
+from helpers.MainTheme import MainTheme
 from vars import WIDTH, HEIGHT, FPS, MAX_SCORE
 
 DIR_PATH = Path.cwd()
-
-main_theme.play()
 
 # Создаем игру и окно
 pygame.init()
@@ -27,33 +26,33 @@ bullets = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
 all_sprites.add(bullets)
-enemy = pygame.sprite.Group()
-death = pygame.sprite.Group()
-dem = pygame.sprite.Group()
-sov = pygame.sprite.Group()
-cl = pygame.sprite.Group()
+death_eaters_group = pygame.sprite.Group()
+dementors_group = pygame.sprite.Group()
+owls_group = pygame.sprite.Group()
+clans_group = pygame.sprite.Group()
 data_base = DataBase()
+main_theme = MainTheme()
 score = 0
 
 def create_dementor():
     dementor_tmp = Enemy([dementor], [6, 8], [-4, 4])
     all_sprites.add(dementor_tmp)
-    dem.add(dementor_tmp)
+    dementors_group.add(dementor_tmp)
 
 def create_owl():
     owl_tmp = Enemy(owls, [2, 4])
     all_sprites.add(owl_tmp)
-    sov.add(owl_tmp)
+    owls_group.add(owl_tmp)
 
 def create_clans():
     clans_tmp = Enemy(clans, [3, 5])
     all_sprites.add(clans_tmp)
-    cl.add(clans_tmp)
+    clans_group.add(clans_tmp)
 
 def create_death_eater():
     death_eater_tmp = Enemy([death_eater], [5, 7], [-2, 2])
     all_sprites.add(death_eater_tmp)
-    death.add(death_eater_tmp)
+    death_eaters_group.add(death_eater_tmp)
 
 def new_enemy():
     create_dementor()
@@ -75,22 +74,20 @@ def show_go_screen():
     draw_text(screen, f'Лучший счёт: {data_base.getMaxScore()}', 35, 250, HEIGHT / 1.5)
     pygame.display.flip()
     waiting = True
-    # pygame.mixer.music.play(loops=-1)
+    main_theme.play()
     while waiting:
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT: # выход из игры
                 pygame.quit()
+                waiting = False
             if event.type == pygame.KEYDOWN: # если нажалась любая клавиша - игра началась
                 click.play()
                 waiting = False
-                # pygame.mixer.music.stop() # музыка в меню остановилась, пошла музыка геймплея
-                # pygame.mixer.music.play(loops=-1)
-                # pygame.mixer.music.set_volume(0.2)
 
 def startGameAgain():
     global waiting
-    global runningw
+    global running
     global game_over
     running = True
     game_over = True
@@ -98,14 +95,16 @@ def startGameAgain():
 
 def quitGame():
     global waiting
+    global running
     waiting = False
+    running = False
     pygame.quit()
 
 def show_out_screen():
     global score
     global waiting
     global data_base
-    data_base.updateMaxScore(score)
+    data_base.updateMaxScore(min(score, MAX_SCORE))
     pygame.mixer.music.stop() # остановка всего звука
     hit_sound.stop()
     hit_enemy_sound.stop()
@@ -116,6 +115,7 @@ def show_out_screen():
         victory_sound.play() # проигрыш звука победы
     else:
         screen.blit(end_menu, end_menu.get_rect()) # если гарри умер, то вывод проигрышного экрана
+        draw_text(screen, str(score), 60, WIDTH / 1.45, HEIGHT / 2.3)
         end_menu_sound.play()
 
     group = pygame.sprite.Group()
@@ -135,7 +135,7 @@ def show_out_screen():
 
         group.update(event_list)
         group.draw(screen)
-        draw_text(screen, str(score), 60, WIDTH / 1.45, HEIGHT / 2.3)
+        
         pygame.display.flip()
 
 def handle_harry_collision_with_enemy(enemy, damage):
@@ -168,11 +168,10 @@ while running:
         player = Player()
         all_sprites.add(player)
         all_sprites.add(bullets)
-        enemy = pygame.sprite.Group()
-        death = pygame.sprite.Group()
-        dem = pygame.sprite.Group()
-        sov = pygame.sprite.Group()
-        cl = pygame.sprite.Group()
+        death_eaters_group = pygame.sprite.Group()
+        dementors_group = pygame.sprite.Group()
+        owls_group = pygame.sprite.Group()
+        clans_group = pygame.sprite.Group()
         score = 0
         for i in range(6):
             new_enemy()
@@ -195,16 +194,16 @@ while running:
     all_sprites.update()
 
     # Столкновения персонажа с противниками
-    handle_harry_collision_with_enemy(dem, 20)
-    handle_harry_collision_with_enemy(sov, 10)
-    handle_harry_collision_with_enemy(cl, 10)
-    handle_harry_collision_with_enemy(death, 40)
+    handle_harry_collision_with_enemy(dementors_group, 20)
+    handle_harry_collision_with_enemy(owls_group, 10)
+    handle_harry_collision_with_enemy(clans_group, 10)
+    handle_harry_collision_with_enemy(death_eaters_group, 40)
 
     # Персонаж попал в противника
-    handle_attacks_collision_with_enemy(dem, 20, create_dementor)
-    handle_attacks_collision_with_enemy(cl, 10, create_clans)
-    handle_attacks_collision_with_enemy(sov, 20, create_owl)
-    handle_attacks_collision_with_enemy(death, 30, create_death_eater)
+    handle_attacks_collision_with_enemy(dementors_group, 20, create_dementor)
+    handle_attacks_collision_with_enemy(clans_group, 10, create_clans)
+    handle_attacks_collision_with_enemy(owls_group, 20, create_owl)
+    handle_attacks_collision_with_enemy(death_eaters_group, 30, create_death_eater)
 
     if score >= MAX_SCORE:
         show_out_screen()
