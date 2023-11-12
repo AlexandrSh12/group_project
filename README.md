@@ -1,1 +1,1 @@
-init
+build exe - pyinstaller main.spec

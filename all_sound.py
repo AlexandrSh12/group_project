@@ -1,12 +1,11 @@
 import pygame
 from pathlib import Path
-
-dir_path = Path.cwd()
+from helpers.LoadResources import resource_path
 
 pygame.mixer.init()
 
 def load_sound(filename, volume):
-    obj = pygame.mixer.Sound(Path(dir_path, "resources", "sound", filename))
+    obj = pygame.mixer.Sound(resource_path(Path("resources", "sound", filename)))
     obj.set_volume(volume)
     return obj
 

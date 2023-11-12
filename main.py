@@ -9,9 +9,8 @@ from helpers.Bullet import Bullet
 from helpers.Button import Button
 from helpers.DataBase import DataBase
 from helpers.MainTheme import MainTheme
+from helpers.LoadResources import resource_path
 from vars import WIDTH, HEIGHT, FPS, MAX_SCORE
-
-DIR_PATH = Path.cwd()
 
 # Создаем игру и окно
 pygame.init()
@@ -62,7 +61,7 @@ def new_enemy():
 
 # универсальная функция для вывода любого текста на экран
 def draw_text(surf, text, size, x, y):
-    font = pygame.font.Font(Path(DIR_PATH, "resources", "fonts", "font.ttf"), size)
+    font = pygame.font.Font(resource_path(Path("resources", "fonts", "font.ttf")), size)
     text_surface = font.render(text, True, "yellow")
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)

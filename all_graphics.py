@@ -1,10 +1,9 @@
 import pygame
 from pathlib import Path
-
-DIR_PATH = Path.cwd()
+from helpers.LoadResources import resource_path
 
 def load_image(path, scale = None):
-    obj = pygame.image.load(Path(DIR_PATH, "resources", "graphics", path))
+    obj = pygame.image.load(resource_path(Path("resources", "graphics", path)))
     if scale != None:
         obj = pygame.transform.scale(obj, scale)
 
