@@ -1,6 +1,6 @@
 
 import pygame
-from all_graphics import harry
+from all_resources import harry
 from vars import WIDTH, HEIGHT
 
 

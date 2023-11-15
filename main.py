@@ -1,7 +1,9 @@
 import pygame
+import sys
 from pathlib import Path
-from all_graphics import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater, again_btn, quit_btn
-from all_sound import hit_sound, hit_enemy_sound, click, victory_sound, end_menu_sound, shoot_sound
+from all_resources import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater, again_btn, quit_btn
+from all_resources import hit_sound, hit_enemy_sound, click, victory_sound, end_menu_sound, shoot_sound
+from all_resources import load_font
 from helpers.Explosion import Explosion
 from helpers.Enemy import Enemy
 from helpers.Player import Player
@@ -9,7 +11,6 @@ from helpers.Bullet import Bullet
 from helpers.Button import Button
 from helpers.DataBase import DataBase
 from helpers.MainTheme import MainTheme
-from helpers.LoadResources import resource_path
 from vars import WIDTH, HEIGHT, FPS, MAX_SCORE
 
 # Создаем игру и окно
@@ -61,7 +62,7 @@ def new_enemy():
 
 # универсальная функция для вывода любого текста на экран
 def draw_text(surf, text, size, x, y):
-    font = pygame.font.Font(resource_path(Path("resources", "fonts", "font.ttf")), size)
+    font = load_font(size)
     text_surface = font.render(text, True, "yellow")
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
@@ -79,7 +80,7 @@ def show_go_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT: # выход из игры
                 pygame.quit()
-                waiting = False
+                sys.exit()
             if event.type == pygame.KEYDOWN: # если нажалась любая клавиша - игра началась
                 click.play()
                 waiting = False
@@ -98,6 +99,7 @@ def quitGame():
     waiting = False
     running = False
     pygame.quit()
+    sys.exit()
 
 def show_out_screen():
     global score

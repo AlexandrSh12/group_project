@@ -1,6 +1,13 @@
+import os
+import sys
 import pygame
 from pathlib import Path
-from helpers.LoadResources import resource_path
+
+def resource_path(relative):    
+    if hasattr(sys, "_MEIPASS"):
+        print(sys._MEIPASS)
+        return os.path.join(sys._MEIPASS, relative)
+    return os.path.join(relative)
 
 def load_image(path, scale = None):
     obj = pygame.image.load(resource_path(Path("resources", "graphics", path)))
@@ -9,7 +16,26 @@ def load_image(path, scale = None):
 
     return obj
 
-# добавление всей основной графики в код
+def load_sound(filename, volume):
+    obj = pygame.mixer.Sound(resource_path(Path("resources", "sound", filename)))
+    obj.set_volume(volume)
+    return obj
+
+def load_font(size):
+    return pygame.font.Font(resource_path(Path("resources", "fonts", "font.ttf")), size)
+
+# заугрзка музыки
+pygame.mixer.init()
+click = load_sound("click.wav", 0.09)
+shoot_sound = load_sound("shoot.wav", 0.5)
+hit_sound = load_sound("enemy_hit.wav", 0.1) 
+hit_enemy_sound = load_sound("enemy_dead.wav", 0.1)
+victory_sound = load_sound("victory.wav", 0.2)
+end_menu_sound = load_sound("dead.wav", 0.2)
+main_theme_path = resource_path(Path("resources", "sound", "main_theme.wav"))
+
+
+# загрузка графики
 harry = load_image("harry.png")
 background = load_image("backgrounds/level.jpg")
 start_menu =load_image("backgrounds/start.png")

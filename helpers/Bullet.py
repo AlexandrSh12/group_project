@@ -1,6 +1,6 @@
 import pygame
 import random
-from all_graphics import attacks
+from all_resources import attacks
 from vars import WIDTH
 
 class Bullet(pygame.sprite.Sprite):

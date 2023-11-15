@@ -1,5 +1,5 @@
 import pygame
-from all_graphics import explosion_anim 
+from all_resources import explosion_anim 
 
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, center):
