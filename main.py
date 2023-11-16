@@ -1,6 +1,5 @@
 import pygame
 import sys
-from pathlib import Path
 from all_resources import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater, again_btn, quit_btn
 from all_resources import hit_sound, hit_enemy_sound, click, victory_sound, end_menu_sound, shoot_sound
 from all_resources import load_font
@@ -9,30 +8,18 @@ from helpers.Enemy import Enemy
 from helpers.Player import Player
 from helpers.Bullet import Bullet
 from helpers.Button import Button
-from helpers.DataBase import DataBase
+from helpers.MaxScoreCounter import MaxScoreCounter
 from helpers.MainTheme import MainTheme
 from vars import WIDTH, HEIGHT, FPS, MAX_SCORE
 
 # Создаем игру и окно
 pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Гарри Поттер")
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
-game_over = True
-running = True
-waiting = False
-all_sprites = pygame.sprite.Group()
-bullets = pygame.sprite.Group()
-player = Player()
-all_sprites.add(player)
-all_sprites.add(bullets)
-death_eaters_group = pygame.sprite.Group()
-dementors_group = pygame.sprite.Group()
-owls_group = pygame.sprite.Group()
-clans_group = pygame.sprite.Group()
-data_base = DataBase()
+max_score_counter = MaxScoreCounter()
 main_theme = MainTheme()
-score = 0
+
 
 def create_dementor():
     dementor_tmp = Enemy([dementor], [6, 8], [-4, 4])
@@ -71,59 +58,51 @@ def draw_text(surf, text, size, x, y):
 # функция вывода стартового меню
 def show_go_screen():
     screen.blit(start_menu, start_menu.get_rect()) # загрузка картинки
-    draw_text(screen, f'Лучший счёт: {data_base.getMaxScore()}', 35, 250, HEIGHT / 1.5)
+    draw_text(screen, f'Лучший счёт: {max_score_counter.getMaxScore()}', 35, 250, HEIGHT / 1.5)
     pygame.display.flip()
     waiting = True
-    main_theme.play()
     while waiting:
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT: # выход из игры
-                pygame.quit()
-                sys.exit()
+                quit_game()
             if event.type == pygame.KEYDOWN: # если нажалась любая клавиша - игра началась
                 click.play()
                 waiting = False
 
-def startGameAgain():
-    global waiting
-    global running
-    global game_over
-    running = True
-    game_over = True
-    waiting = False
+# функция выхода из игры
+def quit_game():
+    global waiting, running
 
-def quitGame():
-    global waiting
-    global running
     waiting = False
     running = False
     pygame.quit()
     sys.exit()
 
-def show_out_screen():
-    global score
-    global waiting
-    global data_base
-    data_base.updateMaxScore(min(score, MAX_SCORE))
-    pygame.mixer.music.stop() # остановка всего звука
+# функция вывода меню выигрыша или проигрыша
+def show_out_screen(isVictory):
+    global score, waiting, max_score_counter
+
+    max_score_counter.updateMaxScore(min(score, MAX_SCORE))
+    main_theme.stop()
     hit_sound.stop()
     hit_enemy_sound.stop()
     shoot_sound.stop()
     
-    if score >= MAX_SCORE: # если набрано необходимое количество очков, вывод победного экрана
-        screen.blit(victory, victory.get_rect()) #
-        victory_sound.play() # проигрыш звука победы
+    if isVictory:
+        screen.blit(victory, victory.get_rect())
+        victory_sound.play()
     else:
-        screen.blit(end_menu, end_menu.get_rect()) # если гарри умер, то вывод проигрышного экрана
+        screen.blit(end_menu, end_menu.get_rect())
         draw_text(screen, str(score), 60, WIDTH / 1.45, HEIGHT / 2.3)
         end_menu_sound.play()
 
     group = pygame.sprite.Group()
-    again_btn_obj = Button(again_btn, again_btn.get_rect(center=(WIDTH / 3 - 50, HEIGHT / 1.35)), startGameAgain)
-    quit_btn_obj = Button(quit_btn, quit_btn.get_rect(center=(WIDTH / 1.5 + 50, HEIGHT / 1.35)), quitGame)
+    again_btn_obj = Button(again_btn, again_btn.get_rect(center=(WIDTH / 3 - 50, HEIGHT / 1.35)), set_up_playground)
+    quit_btn_obj = Button(quit_btn, quit_btn.get_rect(center=(WIDTH / 1.5 + 50, HEIGHT / 1.35)), quit_game)
     group.add(again_btn_obj, quit_btn_obj)
     
+    group.draw(screen)
     pygame.display.flip()
     waiting = True
     while waiting:
@@ -131,14 +110,12 @@ def show_out_screen():
         event_list = pygame.event.get()
         for event in event_list:
             
-            if event.type == pygame.QUIT: # выход из игры
-                quitGame()
+            if event.type == pygame.QUIT:
+                quit_game()
 
         group.update(event_list)
-        group.draw(screen)
-        
-        pygame.display.flip()
 
+# функция обработки столкновения игрока с противником
 def handle_harry_collision_with_enemy(enemy, damage):
     hits = pygame.sprite.spritecollide(player, enemy, True)
     for hit in hits:
@@ -147,6 +124,7 @@ def handle_harry_collision_with_enemy(enemy, damage):
         expl = Explosion(hit.rect.center)
         all_sprites.add(expl)
 
+# функция обработки попадания игрока по противнику
 def handle_attacks_collision_with_enemy(enemys, score_number, create_enemy_func):
     global score
     hits = pygame.sprite.groupcollide(enemys, bullets, True, True)
@@ -157,31 +135,34 @@ def handle_attacks_collision_with_enemy(enemys, score_number, create_enemy_func)
         score += score_number
         create_enemy_func()
 
-for i in range(6):
-    new_enemy()
+# функция подготовки игрового поля
+def set_up_playground():
+    global game_over, running, waiting, all_sprites, bullets, player, death_eaters_group, dementors_group, owls_group, clans_group, score
+    game_over = True
+    running = True
+    waiting = False
+    all_sprites = pygame.sprite.Group()
+    bullets = pygame.sprite.Group()
+    player = Player()
+    all_sprites.add(player)
+    all_sprites.add(bullets)
+    death_eaters_group = pygame.sprite.Group()
+    dementors_group = pygame.sprite.Group()
+    owls_group = pygame.sprite.Group()
+    clans_group = pygame.sprite.Group()
+    score = 0
+    main_theme.play()
 
+    for i in range(6):
+        new_enemy()
+
+set_up_playground()
 show_go_screen()
 while running:
-    if game_over:
-        game_over = False
-        all_sprites = pygame.sprite.Group()
-        bullets = pygame.sprite.Group()
-        player = Player()
-        all_sprites.add(player)
-        all_sprites.add(bullets)
-        death_eaters_group = pygame.sprite.Group()
-        dementors_group = pygame.sprite.Group()
-        owls_group = pygame.sprite.Group()
-        clans_group = pygame.sprite.Group()
-        score = 0
-        for i in range(6):
-            new_enemy()
-
     # Держим цикл на правильной скорости
     clock.tick(FPS)
-    # Ввод процесса (события)
+
     for event in pygame.event.get():
-        # проверка для закрытия окна
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
@@ -207,10 +188,10 @@ while running:
     handle_attacks_collision_with_enemy(death_eaters_group, 30, create_death_eater)
 
     if score >= MAX_SCORE:
-        show_out_screen()
+        show_out_screen(True)
     
     if player.hp <= 0:
-        show_out_screen()
+        show_out_screen(False)
 
     # Рендеринг
     screen.blit(background, background.get_rect())
@@ -222,9 +203,6 @@ while running:
     draw_text(screen, str(player.hp), 48, WIDTH - 80, 27)
     draw_text(screen, f'ЦЕЛЬ:{MAX_SCORE}', 48, 180, HEIGHT - 75)
 
-    # После отрисовки всего, обновляем экран
     pygame.display.flip()
 
-pygame.quit()
-waiting = False
-running = False
+quit_game()

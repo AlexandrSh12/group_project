@@ -2,7 +2,7 @@ import sqlite3
 import tempfile
 from pathlib import Path
 
-class DataBase():
+class MaxScoreCounter():
     def __init__(self):
         self.__connection = sqlite3.connect(str(Path(tempfile.gettempdir(), "HarryPotter.db")))
         self.__cursor = self.__connection.cursor()
