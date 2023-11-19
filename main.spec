@@ -68,7 +68,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Порри Гаттер',
+    name='Порри Гаттер против всех',
     icon='resources/graphics/misc/game_icon.png',
     debug=False,
     bootloader_ignore_signals=False,

@@ -14,7 +14,7 @@ from vars import WIDTH, HEIGHT, FPS, MAX_SCORE
 
 # Создаем игру и окно
 pygame.init()
-pygame.display.set_caption("Гарри Поттер")
+pygame.display.set_caption("Порри Гаттер против всех")
 pygame.display.set_icon(game_icon)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
