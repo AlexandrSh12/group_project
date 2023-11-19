@@ -46,6 +46,7 @@ hog_logo = load_image("misc/hogwarts_logo.png", (80, 80))
 hp = load_image("misc/hp.png", (100, 80))
 again_btn = load_image("buttons/again.png", (270, 90))
 quit_btn = load_image("buttons/quit.png", (270, 90))
+game_icon = load_image("misc/game_icon.png")
 
 # загрузка анимации взрыва противника
 explosion_anim = []

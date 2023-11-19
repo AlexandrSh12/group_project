@@ -1,6 +1,6 @@
 import pygame
 import sys
-from all_resources import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater, again_btn, quit_btn
+from all_resources import background, start_menu, victory, score_text, hog_logo, hp, end_menu, dementor, owls, clans, death_eater, again_btn, quit_btn, game_icon
 from all_resources import hit_sound, hit_enemy_sound, click, victory_sound, end_menu_sound, shoot_sound
 from all_resources import load_font
 from helpers.Explosion import Explosion
@@ -15,6 +15,7 @@ from vars import WIDTH, HEIGHT, FPS, MAX_SCORE
 # Создаем игру и окно
 pygame.init()
 pygame.display.set_caption("Гарри Поттер")
+pygame.display.set_icon(game_icon)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 max_score_counter = MaxScoreCounter()
