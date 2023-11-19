@@ -3,7 +3,7 @@
   
 # Как запустить  
 
-1. У вас должен быть установлен python ^3.11.1 и pip ^22.3.1. [Как установить python](https://www.python.org/downloads/), [как установить pip](https://pip.pypa.io/en/stable/)getting-started/  
+1. У вас должен быть установлен python ^3.11.1 и pip ^22.3.1. [Как установить python](https://www.python.org/downloads/), [как установить pip](https://pip.pypa.io/en/stable/getting-started/)  
 2. Склонируйте проект себе, с помощью команды `git clone https://github.com/AlexandrSh12/group_project.git`  
 3. Находясь в корне проекта, выполните команду `pip install -r requirements.txt`, чтобы установить необходимые пакеты  
 4. Находясь в корне проекта, выполните команду `python main.py`, чтобы запустить игру  
@@ -15,3 +15,4 @@
 3. В папке `dist/` будет лежать готовый .exe файл
 
 # Игровой процесс  
+https://github.com/AlexandrSh12/group_project/assets/38785586/0bd324b3-49ff-4d72-8674-4628d7f86ddf
